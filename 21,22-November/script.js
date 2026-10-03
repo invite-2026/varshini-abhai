@@ -16,6 +16,16 @@ var CONFIG = {
 };
 
 (function () {
+  /* Always open at the first screen after a refresh (don't restore the old scroll position) */
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  scrollTo(0, 0);
+  var touched = false;
+  ['pointerdown', 'touchstart', 'wheel', 'keydown'].forEach(function (t) {
+    addEventListener(t, function () { touched = true; }, { once: true, passive: true });
+  });
+  addEventListener('load', function () { if (!touched) { scrollTo(0, 0); setTimeout(function () { if (!touched) scrollTo(0, 0); }, 80); } });
+  addEventListener('pageshow', function (e) { if (e.persisted) scrollTo(0, 0); });
+
   var $ = function (s) { return document.querySelector(s); };
   var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -87,12 +97,51 @@ var CONFIG = {
      For each tab, find the largest font size (--fs) at which its whole text fits inside the box.
      Re-runs on resize / rotation and once the web fonts have loaded. */
   var storyCard = $('#story .card'), bodies = $$('.body'), fitQueued = false;
+
+  /* Left edge of the arch's cream interior (as a fraction of the card width) at each height
+     (fraction of the card height), measured from the artwork. The right edge is the mirror image. */
+  var ARCH = [[.22,.282],[.24,.245],[.26,.235],[.28,.175],[.30,.155],[.32,.152],[.34,.127],[.36,.114],[.38,.099],[.40,.091],[.60,.091]];
+  function archLeft(f) {
+    if (f <= ARCH[0][0]) return ARCH[0][1];
+    for (var i = 1; i < ARCH.length; i++) if (f <= ARCH[i][0]) {
+      var p = ARCH[i - 1], q = ARCH[i];
+      return p[1] + (q[1] - p[1]) * (f - p[0]) / (q[0] - p[0]);
+    }
+    return ARCH[ARCH.length - 1][1];
+  }
+  /* Two invisible floats at the top of each text box. Their shape follows the arch, so the text
+     wraps inside the curve instead of running over the border on the sides. */
+  function shapeBody(b, cr) {
+    var r = b.getBoundingClientRect(), bh = b.clientHeight, fw = r.width / 2;
+    if (!bh || !fw) return;
+    var sl = b.querySelector('.sh.l'), sr = b.querySelector('.sh.r');
+    if (!sl) {
+      sl = document.createElement('i'); sl.className = 'sh l'; sl.setAttribute('aria-hidden', 'true');
+      sr = document.createElement('i'); sr.className = 'sh r'; sr.setAttribute('aria-hidden', 'true');
+      b.insertBefore(sr, b.firstChild); b.insertBefore(sl, b.firstChild);
+    }
+    var step = Math.max(4, cr.height * 0.006), pl = [], pr = [];
+    for (var y = 0; ; y += step) {
+      var yy = Math.min(y, bh), f = (r.top - cr.top + yy) / cr.height;
+      var x = Math.min(fw, Math.max(0, (archLeft(f) + 0.03) * cr.width - (r.left - cr.left)));
+      pl.push(x.toFixed(1) + 'px ' + yy.toFixed(1) + 'px');
+      pr.push((fw - x).toFixed(1) + 'px ' + yy.toFixed(1) + 'px');
+      if (yy >= bh) break;
+    }
+    var polyL = 'polygon(0px 0px,' + pl.join(',') + ',0px ' + bh + 'px)';
+    var polyR = 'polygon(' + fw + 'px 0px,' + pr.join(',') + ',' + fw + 'px ' + bh + 'px)';
+    [[sl, polyL], [sr, polyR]].forEach(function (p) {
+      p[0].style.width = fw + 'px'; p[0].style.height = bh + 'px';
+      p[0].style.shapeOutside = p[1]; p[0].style.webkitShapeOutside = p[1];
+    });
+  }
   function fitStory() {
     fitQueued = false;
-    var cw = storyCard.clientWidth || innerWidth, hi0 = Math.max(12, cw * 0.02);
+    var cr = storyCard.getBoundingClientRect(), cw = storyCard.clientWidth || innerWidth, hi0 = Math.max(12, cw * 0.02);
     var state = bodies.map(function (b) { return b.hidden; });
     bodies.forEach(function (b) {
       bodies.forEach(function (o) { o.hidden = (o !== b); });      // measure one tab at a time
+      shapeBody(b, cr);
       var lo = 5.5, hi = hi0;
       for (var i = 0; i < 14; i++) {
         var mid = (lo + hi) / 2;
