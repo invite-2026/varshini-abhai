@@ -99,23 +99,36 @@ var CONFIG = {
   var queue = ['assets/invite-frame.webp', 'assets/ganesha.webp', 'assets/events-bg.webp',
                'assets/story-frame.webp', 'assets/photo-frame.webp']
     .concat(CONFIG.eventPhotos, CONFIG.eventPhotosWide || [],
-            [CONFIG.storyPhotos.abhai, CONFIG.storyPhotos.varshini], CONFIG.gallery);
+            [CONFIG.storyPhotos.abhai, CONFIG.storyPhotos.varshini]);
   var held = [];
-  function preloadAll() {
-    queue.filter(Boolean).forEach(function (src, i) {
-      setTimeout(function () {
-        var im = new Image(); im.decoding = 'async'; im.src = src; held.push(im);
-      }, i * 80);   // staggered so it never floods the connection
+  /* Trail photos: small, so fetch them all at once and first */
+  function preloadGallery() {
+    CONFIG.gallery.forEach(function (src) {
+      var im = new Image(); im.decoding = 'async'; im.src = src; held.push(im);
     });
   }
-  function startPreload() { (window.requestIdleCallback || function (f) { setTimeout(f, 500); })(preloadAll); }
+  /* Everything else: one image at a time, so it never competes with what the visitor is viewing */
+  function preloadAll() {
+    var c = navigator.connection;
+    if (c && (c.saveData || /2g/.test(c.effectiveType))) return;   // skip on slow / data-saver
+    var list = queue.filter(Boolean), k = 0;
+    (function next() {
+      if (k >= list.length) return;
+      var im = new Image(); im.decoding = 'async';
+      im.onload = im.onerror = next;
+      im.src = list[k++]; held.push(im);
+    })();
+  }
+  function startPreload() {
+    (window.requestIdleCallback || function (f) { setTimeout(f, 500); })(function () { preloadGallery(); preloadAll(); });
+  }
   if (document.readyState === 'complete') startPreload();
   else addEventListener('load', startPreload);
   var pal = [['#c9806a', '#e8b79a'], ['#7a5aa0', '#b99ad6'], ['#3f7fcb', '#8fc0f0'], ['#b5534f', '#e6a08a'], ['#4d8a6a', '#a6d3b3']];
   function spawn(x, y) {
     if (live > 14) return;
     var d = document.createElement('div'), src = CONFIG.gallery[ti % total];
-    if (src) { d.className = 'tr'; var im = new Image(); im.src = src; im.alt = ''; d.appendChild(im); }
+    if (src) { d.className = 'tr'; var im = new Image(); im.alt = ''; d.style.visibility = 'hidden'; im.onload = function () { d.style.visibility = ''; }; im.src = src; d.appendChild(im); }
     else { var p = pal[ti % pal.length]; d.className = 'tr ph2'; d.style.setProperty('--a', p[0]); d.style.setProperty('--b', p[1]); d.textContent = (ti % total) + 1; }
     ti++; live++;
     d.style.left = (x + (Math.random() * 40 - 20)) + 'px'; d.style.top = (y + (Math.random() * 40 - 20)) + 'px';
@@ -171,5 +184,16 @@ var CONFIG = {
     else if (wantsMusic && resumeOnShow) { resumeOnShow = false; tryPlay(); }  // back again
   });
   addEventListener('pagehide', function () { audio.pause(); });                 // tab closed / left
+  /* ---------- Lazy-load the off-screen frame / background images ---------- */
+  function lazyBg(el, set) {
+    if (!el) return;
+    new IntersectionObserver(function (e, o) { if (e[0].isIntersecting) { set(); o.disconnect(); } }, { rootMargin: '1500px' }).observe(el);
+  }
+  lazyBg($('#story'), function () {
+    $('#story').style.setProperty('--bg', 'url(assets/story-frame.webp)');
+    $('#story .card').style.setProperty('--img', 'url(assets/story-frame.webp)');
+  });
+  lazyBg($('#events'), function () { $('#events').classList.add('bgon'); });
+
   tryPlay(); ui();
 })();
