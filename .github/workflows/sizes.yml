@@ -1,0 +1,12 @@
+name: Show file sizes
+on: workflow_dispatch
+jobs:
+  sizes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: List sizes
+        working-directory: 21,22-November
+        run: |
+          du -ah assets | sort -rh | head -30
+          echo "TOTAL:"; du -sh assets
