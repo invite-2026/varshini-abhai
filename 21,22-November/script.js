@@ -87,6 +87,21 @@ var CONFIG = {
   /* ---------- Photo trail: move/drag over the last page and photos pop up, then fade ---------- */
   var box = $('#count'), trail = $('#trail'), ti = 0, lx = -999, ly = -999, live = 0;
   var total = Math.max(CONFIG.gallery.length, CONFIG.galleryPlaceholders);
+     /* Preload trail photos once the page has loaded, so they pop up instantly */
+  var preloaded = [];
+  function preloadGallery() {
+    CONFIG.gallery.forEach(function (src) {
+      var im = new Image();
+      im.decoding = 'async';
+      im.src = src;
+      preloaded.push(im);   // keep a reference so they stay in memory
+    });
+  }
+  if (document.readyState === 'complete') preloadGallery();
+  else addEventListener('load', function () {
+    (window.requestIdleCallback || function (f) { setTimeout(f, 800); })(preloadGallery);
+  });
+   
   var pal = [['#c9806a', '#e8b79a'], ['#7a5aa0', '#b99ad6'], ['#3f7fcb', '#8fc0f0'], ['#b5534f', '#e6a08a'], ['#4d8a6a', '#a6d3b3']];
   function spawn(x, y) {
     if (live > 14) return;
