@@ -6,6 +6,7 @@
 <title>Abhaiguru &amp; Dhanavarshini — Wedding</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Pinyon+Script&family=Noto+Sans+Tamil:wght@500&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="assets/hero-front.webp" fetchpriority="high">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,13 +15,13 @@
   <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path class="sp" d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path class="on" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path class="off" d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
 </button>
 <div id="gate" hidden role="dialog" aria-label="Open the invitation"><div class="gin"><p class="gn">R. Abhaiguru <i>weds</i> SG. Dhanavarshini</p><button id="open" type="button">Open the Invitation ♪</button></div></div>
-<audio id="bgm" loop preload="auto" src="assets/manamaganini-sathiyam.mp3"></audio>
+<audio id="bgm" loop preload="metadata" src="assets/manamaganini-sathiyam.mp3"></audio>
 
 <section id="hero" aria-label="Welcome">
   <div class="stage">
     <img class="cl c1" src="assets/cloud-c1.webp" alt=""><img class="cl c2" src="assets/cloud-c2.webp" alt=""><img class="cl c3" src="assets/cloud-c3.webp" alt=""><img class="cl c4" src="assets/cloud-c4.webp" alt="">
     <h1 id="names"><span>R. ABHAIGURU</span><small>WEDS</small><span>SG. DHANAVARSHINI</span></h1>
-    <img id="temple" class="temple" src="assets/hero-front.webp" alt="Gopuram of a South Indian temple">
+    <img id="temple" class="temple" fetchpriority="high" decoding="async" src="assets/hero-front.webp" alt="Gopuram of a South Indian temple">
   </div>
 </section>
 
