@@ -116,3 +116,4 @@ footer{background:var(--wine);color:#f1dfb0;text-align:center;padding:48px 20px;
 /* the photo frame grows with the screen so wide displays are not left with empty space */
 @media(min-width:700px){.pframe{width:23.5%}}
 @media(min-width:1000px){.pframe{width:27%}}
+@media(max-width:700px){.bleed::before{display:none}}
