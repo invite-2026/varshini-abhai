@@ -54,7 +54,7 @@ body{margin:0;background:#1b0a10;color:var(--ink);font-family:'Cormorant Garamon
 .info h2{margin:0 0 .35em;font-size:clamp(28px,4.6vw,72px);font-weight:600;color:#1c1410;line-height:1.1}
 .info p{margin:.25em 0;font-size:clamp(17px,1.7vw,28px)}
 .btn{display:inline-block;margin-top:14px;padding:.6em 1.4em;border-radius:99px;background:#14307a;color:#fff;text-decoration:none;font-size:17px}
-@media(max-width:560px){.slide{grid-template-columns:1fr}.ph{aspect-ratio:16/10}}
+@media(max-width:560px){.slide{grid-template-columns:1fr}.ph{width:72%;margin:0 auto}}   /* photo stays portrait (3/4) on phones */
 
 /* story: the text box fills the arch down to the temple towers. script.js (fitStory) picks the
    largest font size (--fs) at which each tab's text fits, so nothing needs scrolling.
@@ -68,6 +68,8 @@ body{margin:0;background:#1b0a10;color:var(--ink);font-family:'Cormorant Garamon
 .body h3{margin:0 0 .3em;font-size:calc(var(--fs)*1.12);line-height:1.2;text-align:center}
 .body p{margin:0 0 .45em;font-size:var(--fs);line-height:1.26}
 .body p:last-child{margin-bottom:0}
+/* invisible shaped floats (added by script.js) that make the text follow the curve of the arch */
+.sh{display:block;pointer-events:none}.sh.l{float:left}.sh.r{float:right}
 .pframe{position:absolute;left:50%;transform:translateX(-50%);width:21%;top:55%;aspect-ratio:605/786}
 .pframe>img{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .pw{position:absolute;inset:11.45% 15.87% 13.1% 15.04%;display:grid;place-items:center;overflow:hidden;background:#efe3cc;font-size:max(9px,1.3cqw);color:#7a5a2a;text-align:center}
@@ -107,5 +109,4 @@ footer{background:var(--wine);color:#f1dfb0;text-align:center;padding:48px 20px;
 #open:hover{background:rgba(255,255,255,.28)}
 
 .ph picture{display:block;width:100%;height:100%}
-@media(max-width:560px){.ph img{object-position:center 25%}}
 @media(max-width:700px){.bleed::before{display:none}}
