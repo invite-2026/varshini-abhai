@@ -11,8 +11,8 @@ var CONFIG = {
   // Photos shown in the gold frame on the "Our Story" page
   storyPhotos: { abhai: 'assets/story/abhai.jpg', varshini: 'assets/story/varshini.jpg' },
   // The photo trail on the last page ("Touch here for magic"). Add up to ~20 paths.
-  gallery: (function () { var a = []; for (var n = 1; n <= 20; n++) a.push('assets/gallery/photo-' + (n < 10 ? '0' : '') + n + '.jpg'); return a; })(),  // replace assets/gallery/photo-01.jpg … photo-20.jpg with your photos (same names)
-  galleryPlaceholders: 20             // how many placeholder cards to use when gallery is empty
+  gallery: (function () { var a = []; for (var n = 1; n <= 18; n++) a.push('assets/gallery/photo-' + (n < 10 ? '0' : '') + n + '.jpg'); return a; })(),  // replace assets/gallery/photo-01.jpg … photo-20.jpg with your photos (same names)
+  galleryPlaceholders: 18             // how many placeholder cards to use when gallery is empty
 };
 
 (function () {
