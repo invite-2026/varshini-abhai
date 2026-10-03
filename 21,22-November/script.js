@@ -7,7 +7,7 @@ var CONFIG = {
   // One photo per event card:  [Wedding Ceremony, Reception Evening]
   eventPhotos: ['assets/events/wedding-ceremony.jpg', 'assets/events/reception-evening.jpg'],
   // Optional landscape versions shown on phones (<=560px). Leave '' to reuse the portrait photo.
-  eventPhotosWide: ['', ''],   // e.g. ['assets/events/wedding-ceremony-wide.jpg', 'assets/events/reception-evening-wide.jpg']              // e.g. ['assets/photos/ceremony.jpg', 'assets/photos/reception.jpg']
+  eventPhotosWide: ['', ''],   // e.g. ['assets/events/wedding-ceremony-wide.jpg', 'assets/events/reception-evening-wide.jpg']
   // Photos shown in the gold frame on the "Our Story" page
   storyPhotos: { abhai: 'assets/story/abhai.jpg', varshini: 'assets/story/varshini.jpg' },
   // The photo trail on the last page ("Touch here for magic"). Add up to ~20 paths.
@@ -82,6 +82,32 @@ var CONFIG = {
       sp.style.opacity = 0; setTimeout(function () { sp.src = u; sp.alt = b.dataset.t === 'a' ? 'Abhai and Varshini' : 'Varshini and Abhai'; sp.style.opacity = 1; }, 180);
     };
   });
+
+  /* ---------- Story: shrink-to-fit, so neither tab ever needs scrolling ----------
+     For each tab, find the largest font size (--fs) at which its whole text fits inside the box.
+     Re-runs on resize / rotation and once the web fonts have loaded. */
+  var storyCard = $('#story .card'), bodies = $$('.body'), fitQueued = false;
+  function fitStory() {
+    fitQueued = false;
+    var cw = storyCard.clientWidth || innerWidth, hi0 = Math.max(12, cw * 0.02);
+    var state = bodies.map(function (b) { return b.hidden; });
+    bodies.forEach(function (b) {
+      bodies.forEach(function (o) { o.hidden = (o !== b); });      // measure one tab at a time
+      var lo = 5.5, hi = hi0;
+      for (var i = 0; i < 14; i++) {
+        var mid = (lo + hi) / 2;
+        b.style.setProperty('--fs', mid + 'px');
+        if (b.scrollHeight <= b.clientHeight + 1) lo = mid; else hi = mid;
+      }
+      b.style.setProperty('--fs', lo.toFixed(2) + 'px');
+    });
+    bodies.forEach(function (b, i) { b.hidden = state[i]; });
+  }
+  function queueFit() { if (!fitQueued) { fitQueued = true; requestAnimationFrame(fitStory); } }
+  fitStory();
+  addEventListener('resize', queueFit);
+  addEventListener('load', queueFit);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(queueFit);
 
   /* ---------- Countdown (22 Nov 2026, 9:00 AM IST) ---------- */
   var target = new Date('2026-11-22T09:00:00+05:30');
