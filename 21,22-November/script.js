@@ -5,12 +5,14 @@
    ===================================================================== */
 var CONFIG = {
   // One photo per event card:  [Wedding Ceremony, Reception Evening]
-  eventPhotos: ['assets/events/wedding-ceremony.jpg', 'assets/events/reception-evening.jpg'],              // e.g. ['assets/photos/ceremony.jpg', 'assets/photos/reception.jpg']
+  eventPhotos: ['assets/events/wedding-ceremony.jpg', 'assets/events/reception-evening.jpg'],
+  // Optional landscape versions shown on phones (<=560px). Leave '' to reuse the portrait photo.
+  eventPhotosWide: ['', ''],   // e.g. ['assets/events/wedding-ceremony-wide.jpg', 'assets/events/reception-evening-wide.jpg']              // e.g. ['assets/photos/ceremony.jpg', 'assets/photos/reception.jpg']
   // Photos shown in the gold frame on the "Our Story" page
   storyPhotos: { abhai: 'assets/story/abhai.jpg', varshini: 'assets/story/varshini.jpg' },
   // The photo trail on the last page ("Touch here for magic"). Add up to ~20 paths.
-  gallery: (function () { var a = []; for (var n = 1; n <= 18; n++) a.push('assets/gallery/photo-' + (n < 10 ? '0' : '') + n + '.jpg'); return a; })(),  // replace assets/gallery/photo-01.jpg … photo-20.jpg with your photos (same names)
-  galleryPlaceholders: 18             // how many placeholder cards to use when gallery is empty
+  gallery: (function () { var a = []; for (var n = 1; n <= 20; n++) a.push('assets/gallery/photo-' + (n < 10 ? '0' : '') + n + '.jpg'); return a; })(),  // replace assets/gallery/photo-01.jpg … photo-20.jpg with your photos (same names)
+  galleryPlaceholders: 20             // how many placeholder cards to use when gallery is empty
 };
 
 (function () {
@@ -60,8 +62,13 @@ var CONFIG = {
 
   /* ---------- Event photos (placeholders until CONFIG.eventPhotos is filled) ---------- */
   $$('.ph').forEach(function (el) {
-    var src = CONFIG.eventPhotos[+el.dataset.ev];
-    if (src) { el.textContent = ''; var im = new Image(); im.src = src; im.alt = ''; el.appendChild(im); }
+    var i = +el.dataset.ev, src = CONFIG.eventPhotos[i], wide = CONFIG.eventPhotosWide[i];
+    if (!src) return;
+    el.textContent = '';
+    var pic = document.createElement('picture');
+    if (wide) { var so = document.createElement('source'); so.media = '(max-width:560px)'; so.srcset = wide; pic.appendChild(so); }
+    var im = new Image(); im.src = src; im.alt = ''; pic.appendChild(im);
+    el.appendChild(pic);
   });
 
   /* ---------- Story tabs (swap the framed photo) ---------- */
@@ -87,21 +94,23 @@ var CONFIG = {
   /* ---------- Photo trail: move/drag over the last page and photos pop up, then fade ---------- */
   var box = $('#count'), trail = $('#trail'), ti = 0, lx = -999, ly = -999, live = 0;
   var total = Math.max(CONFIG.gallery.length, CONFIG.galleryPlaceholders);
-     /* Preload trail photos once the page has loaded, so they pop up instantly */
-  var preloaded = [];
-  function preloadGallery() {
-    CONFIG.gallery.forEach(function (src) {
-      var im = new Image();
-      im.decoding = 'async';
-      im.src = src;
-      preloaded.push(im);   // keep a reference so they stay in memory
+
+  /* Preload the rest of the site quietly, after the first screen has loaded */
+  var queue = ['assets/invite-frame.webp', 'assets/ganesha.webp', 'assets/events-bg.webp',
+               'assets/story-frame.webp', 'assets/photo-frame.webp']
+    .concat(CONFIG.eventPhotos, CONFIG.eventPhotosWide || [],
+            [CONFIG.storyPhotos.abhai, CONFIG.storyPhotos.varshini], CONFIG.gallery);
+  var held = [];
+  function preloadAll() {
+    queue.filter(Boolean).forEach(function (src, i) {
+      setTimeout(function () {
+        var im = new Image(); im.decoding = 'async'; im.src = src; held.push(im);
+      }, i * 80);   // staggered so it never floods the connection
     });
   }
-  if (document.readyState === 'complete') preloadGallery();
-  else addEventListener('load', function () {
-    (window.requestIdleCallback || function (f) { setTimeout(f, 800); })(preloadGallery);
-  });
-   
+  function startPreload() { (window.requestIdleCallback || function (f) { setTimeout(f, 500); })(preloadAll); }
+  if (document.readyState === 'complete') startPreload();
+  else addEventListener('load', startPreload);
   var pal = [['#c9806a', '#e8b79a'], ['#7a5aa0', '#b99ad6'], ['#3f7fcb', '#8fc0f0'], ['#b5534f', '#e6a08a'], ['#4d8a6a', '#a6d3b3']];
   function spawn(x, y) {
     if (live > 14) return;
