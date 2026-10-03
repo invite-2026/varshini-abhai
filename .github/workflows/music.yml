@@ -1,0 +1,20 @@
+name: Shrink music
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  mp3:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - working-directory: 21,22-November/assets
+        run: |
+          ffmpeg -y -i manamaganini-sathiyam.mp3 -b:a 64k -ac 1 /tmp/s.mp3
+          ls -l manamaganini-sathiyam.mp3 /tmp/s.mp3
+          mv /tmp/s.mp3 manamaganini-sathiyam.mp3
+      - run: |
+          git config user.name github-actions
+          git config user.email actions@github.com
+          git add -A
+          git diff --cached --quiet || (git commit -m "Shrink music" && git push)
