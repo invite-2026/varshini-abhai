@@ -56,16 +56,19 @@ body{margin:0;background:#1b0a10;color:var(--ink);font-family:'Cormorant Garamon
 .btn{display:inline-block;margin-top:14px;padding:.6em 1.4em;border-radius:99px;background:#14307a;color:#fff;text-decoration:none;font-size:17px}
 @media(max-width:560px){.slide{grid-template-columns:1fr}.ph{aspect-ratio:16/10}}
 
-/* story: text lives inside the arch above the gold frame; long text scrolls inside its box */
-.sty{left:22%;right:22%;top:25.6%;bottom:53.8%;justify-content:flex-start;color:#3a1a14}
-.tabs{display:flex;gap:8px;margin-bottom:.8cqw}
-.tab{font:inherit;font-size:max(11px,1.8cqw);padding:.05em .9em;border:1px solid #9b7a3c;background:transparent;color:#5a3a1a;border-radius:99px;cursor:pointer}
+/* story: the text box fills the arch down to the temple towers. script.js (fitStory) picks the
+   largest font size (--fs) at which each tab's text fits, so nothing needs scrolling.
+   Everything is a % of the card, so it follows the page width on phones and desktops alike. */
+.sty{left:15%;right:15%;top:24.2%;bottom:46.6%;justify-content:flex-start;color:#3a1a14}
+.tabs{display:flex;gap:8px;margin-bottom:.5cqw;flex:none}
+.tab{font:inherit;font-size:max(10.5px,1.7cqw);line-height:1.25;padding:.02em .9em;border:1px solid #9b7a3c;background:transparent;color:#5a3a1a;border-radius:99px;cursor:pointer}
 .tab[aria-selected=true]{background:#7a1a2e;color:#f6e7c8;border-color:#7a1a2e}
-.body{overflow-y:auto;width:100%;text-align:justify;scrollbar-width:thin;scrollbar-color:#b49a64 transparent;padding-right:4px}
+.body{--fs:11px;flex:1;min-height:0;width:100%;overflow-y:auto;text-align:justify;hyphens:auto;-webkit-hyphens:auto;scrollbar-width:thin;scrollbar-color:#b49a64 transparent}
 .body[hidden]{display:none}
-.body h3{margin:0 0 .3em;font-size:max(12px,1.8cqw);text-align:center}
-.body p{margin:0 0 .5em;font-size:max(11.5px,1.7cqw);line-height:1.38}
-.pframe{position:absolute;left:50%;transform:translateX(-50%);width:19%;bottom:38.5%;aspect-ratio:605/786}
+.body h3{margin:0 0 .3em;font-size:calc(var(--fs)*1.12);line-height:1.2;text-align:center}
+.body p{margin:0 0 .45em;font-size:var(--fs);line-height:1.26}
+.body p:last-child{margin-bottom:0}
+.pframe{position:absolute;left:50%;transform:translateX(-50%);width:21%;top:55%;aspect-ratio:605/786}
 .pframe>img{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .pw{position:absolute;inset:11.45% 15.87% 13.1% 15.04%;display:grid;place-items:center;overflow:hidden;background:#efe3cc;font-size:max(9px,1.3cqw);color:#7a5a2a;text-align:center}
 .pw img{width:100%;height:100%;object-fit:cover;object-position:50% 38%;transition:opacity .35s}
@@ -85,14 +88,6 @@ body{margin:0;background:#1b0a10;color:var(--ink);font-family:'Cormorant Garamon
 footer{background:var(--wine);color:#f1dfb0;text-align:center;padding:48px 20px;font-size:20px;letter-spacing:.08em}
 @media(prefers-reduced-motion:reduce){.slide,.mt.hint::after{animation:none}#snaps{display:none}}
 
-/* phones: slightly wider text area and smaller type so the story fits without scrolling */
-@media(max-width:600px){
- .sty{left:16%;right:16%;top:24.4%}
- .tab{font-size:10.5px}
- .body h3{font-size:11px;margin-bottom:.2em}
- .body p{font-size:10.2px;line-height:1.32;margin-bottom:.35em}
-}
-
 .ph img{width:100%;height:100%;object-fit:cover;display:block}
 /* photo trail on the last page */
 #trail{position:absolute;inset:0;pointer-events:none;overflow:hidden}
@@ -110,10 +105,7 @@ footer{background:var(--wine);color:#f1dfb0;text-align:center;padding:48px 20px;
 .gn i{display:block;font-size:.5em;letter-spacing:.3em;margin:.4em 0}
 #open{font:inherit;font-size:clamp(18px,2.4vw,24px);padding:.7em 1.8em;border-radius:99px;border:1.5px solid #fff;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
 #open:hover{background:rgba(255,255,255,.28)}
+
 .ph picture{display:block;width:100%;height:100%}
 @media(max-width:560px){.ph img{object-position:center 25%}}
-
-/* the photo frame grows with the screen so wide displays are not left with empty space */
-@media(min-width:700px){.pframe{width:23.5%}}
-@media(min-width:1000px){.pframe{width:27%}}
 @media(max-width:700px){.bleed::before{display:none}}
