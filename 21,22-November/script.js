@@ -171,6 +171,5 @@ var CONFIG = {
     else if (wantsMusic && resumeOnShow) { resumeOnShow = false; tryPlay(); }  // back again
   });
   addEventListener('pagehide', function () { audio.pause(); });                 // tab closed / left
-  ui();
-  addEventListener('load', function () { setTimeout(tryPlay, 1500); });
+  tryPlay(); ui();
 })();
