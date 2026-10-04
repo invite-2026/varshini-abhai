@@ -61,8 +61,9 @@ var CONFIG = {
     dots.forEach(function (d, k) { d.setAttribute('aria-current', k === cur); });
   }
   dots.forEach(function (d) { d.onclick = function () { show(+d.dataset.i); }; });
-  $('#prev').onclick = function () { show(cur - 1); };
-  $('#next').onclick = function () { show(cur + 1); };
+  var prevBtn = $('#prev'), nextBtn = $('#next');          // the arrow buttons are optional
+  if (prevBtn) prevBtn.onclick = function () { show(cur - 1); };
+  if (nextBtn) nextBtn.onclick = function () { show(cur + 1); };
   var x0 = null, ev = $('#ev');
   ev.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
   ev.addEventListener('touchend', function (e) {
