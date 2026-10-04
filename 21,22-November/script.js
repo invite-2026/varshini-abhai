@@ -137,7 +137,7 @@ var CONFIG = {
   }
   function fitStory() {
     fitQueued = false;
-    var cr = storyCard.getBoundingClientRect(), cw = storyCard.clientWidth || innerWidth, hi0 = Math.max(12, cw * 0.02);
+    var cr = storyCard.getBoundingClientRect(), cw = storyCard.clientWidth || innerWidth, hi0 = Math.max(12, cw * 0.026);
     var state = bodies.map(function (b) { return b.hidden; });
     bodies.forEach(function (b) {
       bodies.forEach(function (o) { o.hidden = (o !== b); });      // measure one tab at a time
