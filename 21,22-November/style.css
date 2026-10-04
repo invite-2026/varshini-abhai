@@ -63,7 +63,7 @@ body{margin:0;background:#1b0a10;color:var(--ink);font-family:'Cormorant Garamon
 .tabs{display:flex;gap:8px;margin-bottom:.5cqw;flex:none}
 .tab{font:inherit;font-size:max(10.5px,1.7cqw);line-height:1.25;padding:.02em .9em;border:1px solid #9b7a3c;background:transparent;color:#5a3a1a;border-radius:99px;cursor:pointer}
 .tab[aria-selected=true]{background:#7a1a2e;color:#f6e7c8;border-color:#7a1a2e}
-.body{font-family:'Crimson Pro','Cormorant Garamond',Georgia,serif;--fs:11px;flex:1;min-height:0;width:100%;overflow-y:auto;text-align:justify;hyphens:auto;-webkit-hyphens:auto;scrollbar-width:thin;scrollbar-color:#b49a64 transparent}
+.body{font-family:'Crimson Pro','Cormorant Garamond',Georgia,serif;--fs:11px;flex:1;min-height:0;width:100%;overflow-y:auto;text-align:center;hyphens:none;-webkit-hyphens:none;text-wrap:pretty;scrollbar-width:thin;scrollbar-color:#b49a64 transparent}
 .body[hidden]{display:none}
 .body h3{margin:0 0 .3em;font-size:calc(var(--fs)*1.12);line-height:1.2;text-align:center}
 .body p{margin:0 0 .45em;font-size:var(--fs);line-height:1.26}
