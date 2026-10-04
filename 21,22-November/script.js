@@ -88,6 +88,7 @@ var CONFIG = {
     b.onclick = function () {
       $$('.tab').forEach(function (x) { x.setAttribute('aria-selected', x === b); });
       var a = b.dataset.t === 'a'; $('#ta').hidden = !a; $('#tv').hidden = a;
+      placeFrame();
       var u = b.dataset.t === 'a' ? CONFIG.storyPhotos.abhai : CONFIG.storyPhotos.varshini;
       sp.style.opacity = 0; setTimeout(function () { sp.src = u; sp.alt = b.dataset.t === 'a' ? 'Abhai and Varshini' : 'Varshini and Abhai'; sp.style.opacity = 1; }, 180);
     };
@@ -135,28 +136,45 @@ var CONFIG = {
       p[0].style.shapeOutside = p[1]; p[0].style.webkitShapeOutside = p[1];
     });
   }
+  /* Largest font size at which a tab's whole text fits its box (nothing is scrolled or cut).
+     Both tabs share the smaller of the two sizes, so the type looks the same on each. */
   function fitStory() {
     fitQueued = false;
     var cr = storyCard.getBoundingClientRect(), cw = storyCard.clientWidth || innerWidth, hi0 = Math.max(12, cw * 0.02);
     var state = bodies.map(function (b) { return b.hidden; });
-    bodies.forEach(function (b) {
+    var sizes = bodies.map(function (b) {
       bodies.forEach(function (o) { o.hidden = (o !== b); });      // measure one tab at a time
       shapeBody(b, cr);
-      var lo = 5.5, hi = hi0;
+      var last = b.lastElementChild, lo = 4.5, hi = hi0;
       for (var i = 0; i < 14; i++) {
         var mid = (lo + hi) / 2;
         b.style.setProperty('--fs', mid + 'px');
-        if (b.scrollHeight <= b.clientHeight + 1) lo = mid; else hi = mid;
+        var over = last.getBoundingClientRect().bottom - b.getBoundingClientRect().bottom;
+        if (over <= -2) lo = mid; else hi = mid;                    // keep a 2px safety margin
       }
-      b.style.setProperty('--fs', lo.toFixed(2) + 'px');
+      return lo;
     });
-    bodies.forEach(function (b, i) { b.hidden = state[i]; });
+    var fs = Math.min.apply(null, sizes).toFixed(2) + 'px';
+    bodies.forEach(function (b, i) { b.style.setProperty('--fs', fs); b.hidden = state[i]; });
+    placeFrame();
+  }
+  /* The photo frame sits just under the last line of whichever story is showing,
+     so it moves up for the shorter text and down for the longer one. */
+  var pframe = $('.pframe');
+  function placeFrame() {
+    var vis = bodies.filter(function (b) { return !b.hidden; })[0];
+    var cr = storyCard.getBoundingClientRect();
+    if (!vis || !vis.lastElementChild || !cr.height) return;
+    var bottom = vis.lastElementChild.getBoundingClientRect().bottom - cr.top;
+    var top = Math.min(Math.max(bottom + cr.width * 0.025, cr.height * 0.38), cr.height * 0.58);
+    pframe.style.top = (top / cr.height * 100).toFixed(2) + '%';
   }
   function queueFit() { if (!fitQueued) { fitQueued = true; requestAnimationFrame(fitStory); } }
   fitStory();
   addEventListener('resize', queueFit);
   addEventListener('load', queueFit);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(queueFit);
+  if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', queueFit);
 
   /* ---------- Countdown (22 Nov 2026, 9:00 AM IST) ---------- */
   var target = new Date('2026-11-22T09:00:00+05:30');
